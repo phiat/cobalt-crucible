@@ -2,35 +2,54 @@
 
 Incus dev container setup for WSL2.
 
-## Prerequisites
+## Setup
 
-Install Incus and initialize it:
+### 1. Install Incus
 
 ```bash
 sudo apt install incus
 sudo incus admin init --auto
 ```
 
-For proper memory reporting with resource limits, also set up [lxcfs](#lxcfs-on-wsl2).
+### 2. Fix lxcfs for WSL2 (optional but recommended)
 
-## Quick Start
-
-**New machine:**
+Without this, tools like `htop` and `free` inside containers report host memory instead of the container's limit. Only needed once per host.
 
 ```bash
-sudo apt install incus
-sudo incus admin init --auto
+sudo apt install lxcfs
+sudo mkdir -p /etc/systemd/system/lxcfs.service.d
+
+sudo tee /etc/systemd/system/lxcfs.service.d/override.conf > /dev/null << 'EOF'
+[Unit]
+ConditionVirtualization=
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl start lxcfs
+```
+
+lxcfs won't start on WSL2 without the override because systemd detects WSL2 as a container environment and skips it.
+
+### 3. Build the container
+
+```bash
 git clone https://github.com/phiat/cobalt-crucible.git
 cd cobalt-crucible
 bash create-dev-container.sh my-dev ./dev-setup.sh
+```
+
+This takes 15-20 minutes (Erlang compiles from source).
+
+### 4. Shell in
+
+```bash
 incus shell my-dev
 ```
 
-**From snapshot (fast — seconds, local only):**
+Claude Code and OpenCode require login after first launch:
 
 ```bash
-incus launch cobalt-crucible-base <name>
-incus shell <name>
+claude login
 ```
 
 ## What Gets Installed
@@ -47,26 +66,21 @@ incus shell <name>
 
 ## Snapshots
 
-Build once, launch instantly. After a full build:
+After building, save the container as a reusable image so future containers launch in seconds:
 
 ```bash
-# Stop the container
-incus stop <name>
-
-# Publish as a reusable image
-incus publish <name> --alias cobalt-crucible-base
-
-# Restart the original
-incus start <name>
+incus stop my-dev
+incus publish my-dev --alias cobalt-crucible-base
+incus start my-dev
 ```
 
-Launch new containers from the snapshot:
+Launch from snapshot:
 
 ```bash
-incus launch cobalt-crucible-base my-new-container
+incus launch cobalt-crucible-base <name>
 ```
 
-Update the snapshot after changes:
+Update the snapshot after making changes:
 
 ```bash
 incus stop <name>
@@ -75,22 +89,9 @@ incus publish <name> --alias cobalt-crucible-base
 incus start <name>
 ```
 
-List local images:
-
-```bash
-incus image list
-```
-
 ## Resource Limits
 
-Set in `create-dev-container.sh` after launch (applied live, no restart needed):
-
-| Resource | Limit | Config key |
-|----------|-------|------------|
-| Memory | 8GB (hard cap) | `limits.memory` |
-| CPU | 8 cores | `limits.cpu` |
-
-Adjust per container:
+Defaults are set in `create-dev-container.sh` (8GB memory, 8 CPUs). Adjust per container:
 
 ```bash
 incus config set <name> limits.memory 4GB
@@ -99,38 +100,7 @@ incus config set <name> limits.cpu.allowance 50%
 incus config device set <name> root size=20GB
 ```
 
-## Auth
-
-Claude Code uses OAuth and tokens aren't portable across machines. After launching a new container, log in manually:
-
-```bash
-incus shell <name>
-claude login
-```
-
-## lxcfs on WSL2
-
-By default, `/proc/meminfo` inside the container reports host memory even with limits set. lxcfs fixes this so tools like `htop` and `free` report the actual container limit.
-
-lxcfs ships with Ubuntu but won't start on WSL2 due to a systemd condition (`ConditionVirtualization=!container`). Override it once on the host:
-
-```bash
-sudo mkdir -p /etc/systemd/system/lxcfs.service.d
-
-sudo tee /etc/systemd/system/lxcfs.service.d/override.conf > /dev/null << 'EOF'
-[Unit]
-ConditionVirtualization=
-EOF
-
-sudo systemctl daemon-reload
-sudo systemctl start lxcfs
-```
-
-Then restart the container:
-
-```bash
-incus restart <name>
-```
+Changes apply live — no restart needed.
 
 ## Common Commands
 
@@ -142,4 +112,5 @@ incus config show <name>    # full config
 incus restart <name>        # restart
 incus stop <name>           # stop
 incus delete <name> --force # delete
+incus image list            # list local images
 ```
