@@ -125,7 +125,7 @@ $MISE_PATH use -g --jobs 4 \
   node@lts go@latest rust@latest zig@latest \
   bun@latest jq@latest bat@latest typst@latest \
   lazydocker@latest java@openjdk clojure@latest \
-  yarn@latest ripgrep@latest fd@latest \
+  yarn@latest ripgrep@latest fd@latest just@latest \
   > /dev/null 2>&1 || error "Failed to install binary tools"
 complete
 
@@ -169,6 +169,7 @@ echo "  • lazydocker: $(lazydocker --version 2>/dev/null | awk '{print $4}' ||
 echo "  • yarn: $(yarn --version 2>/dev/null || echo 'NOT FOUND')"
 echo "  • ripgrep: $(rg --version 2>/dev/null | head -n1 | awk '{print $2}' || echo 'NOT FOUND')"
 echo "  • fd: $(fd --version 2>/dev/null | awk '{print $2}' || echo 'NOT FOUND')"
+echo "  • just: $(just --version 2>/dev/null | awk '{print $2}' || echo 'NOT FOUND')"
 echo "  • gh: $(gh --version 2>/dev/null | head -n1 | awk '{print $3}' || echo 'NOT FOUND')"
 echo "  • tree: $(tree --version 2>/dev/null | awk '{print $2}' || echo 'NOT FOUND')"
 echo "  • mise: $($MISE_PATH --version 2>/dev/null || echo 'NOT FOUND')"

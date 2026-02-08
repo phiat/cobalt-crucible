@@ -56,7 +56,7 @@ incus rename my-dev new-name
 - **System**: build-essential, curl, wget, git, htop, tmux, tree, net-tools, etc.
 - **Shell**: zsh + Oh My Zsh (agnoster theme), tmux (maroon/cyan theme, mouse on, status top)
 - **Languages** (via mise): Node.js, Go, Rust, Erlang, Elixir, Python, Java, Clojure, Zig, Bun
-- **CLI tools** (via mise): jq, bat, typst, lazydocker, yarn, ripgrep, fd
+- **CLI tools** (via mise): jq, bat, typst, lazydocker, yarn, ripgrep, fd, just
 - **Containers**: Podman
 - **Networking**: Tailscale
 - **Dev tools**: Claude Code, OpenCode, GitHub CLI (gh), fzf
