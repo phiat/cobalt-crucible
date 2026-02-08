@@ -30,33 +30,14 @@ else
     echo ""
 fi
 
-# Setup SSH key if available
-if [ -f "$HOME/.ssh/id_rsa.pub" ]; then
-    echo "🔑 Setting up SSH key..."
-    incus exec "$CONTAINER_NAME" -- mkdir -p /root/.ssh
-    incus file push "$HOME/.ssh/id_rsa.pub" "$CONTAINER_NAME/root/.ssh/authorized_keys"
-    incus exec "$CONTAINER_NAME" -- chmod 700 /root/.ssh
-    incus exec "$CONTAINER_NAME" -- chmod 600 /root/.ssh/authorized_keys
-elif [ -f "$HOME/.ssh/id_ed25519.pub" ]; then
-    echo "🔑 Setting up SSH key..."
-    incus exec "$CONTAINER_NAME" -- mkdir -p /root/.ssh
-    incus file push "$HOME/.ssh/id_ed25519.pub" "$CONTAINER_NAME/root/.ssh/authorized_keys"
-    incus exec "$CONTAINER_NAME" -- chmod 700 /root/.ssh
-    incus exec "$CONTAINER_NAME" -- chmod 600 /root/.ssh/authorized_keys
-fi
-
-# Set root password
-echo ""
-echo "🔐 Set root password for SSH access:"
-incus exec "$CONTAINER_NAME" -- passwd
 
 # Setup Tailscale if auth key is available
 if [ -n "$TAILSCALE_AUTHKEY" ] || [ -f "$HOME/.tailscale-authkey" ]; then
     AUTHKEY="${TAILSCALE_AUTHKEY:-$(cat "$HOME/.tailscale-authkey" 2>/dev/null)}"
 
     if [ -n "$AUTHKEY" ]; then
-        echo "🔗 Connecting to Tailscale..."
-        incus exec "$CONTAINER_NAME" -- tailscale up --authkey="$AUTHKEY" --hostname="$CONTAINER_NAME" > /dev/null 2>&1
+        echo "🔗 Connecting to Tailscale with SSH enabled..."
+        incus exec "$CONTAINER_NAME" -- tailscale up --authkey="$AUTHKEY" --hostname="$CONTAINER_NAME" --ssh > /dev/null 2>&1
 
         TAILSCALE_IP=$(incus exec "$CONTAINER_NAME" -- tailscale ip -4 2>/dev/null)
 
