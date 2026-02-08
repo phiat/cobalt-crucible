@@ -9,35 +9,29 @@ This provisions isolated, resource-limited Ubuntu 24.04 containers from your Ubu
 ## Setup
 
 ```bash
-# 1. Install Incus
-# Ensure universe repository is enabled and package cache is updated
+# 1. Install Incus and add user to incus-admin group
 sudo add-apt-repository -y universe
 sudo apt update
 sudo apt install -y incus
 sudo incus admin init --auto
+sudo usermod -aG incus-admin $USER
 
-# 2. Fix lxcfs for WSL2 (recommended)
-# This fixes resource reporting inside containers. Without it, tools like htop
-# and free show host memory instead of container limits. Only needed once per WSL2 host.
-sudo apt install -y lxcfs
-sudo mkdir -p /etc/systemd/system/lxcfs.service.d
+# 2. Run remaining setup with incus-admin group active (using sg)
+# This uses 'sg' to run commands with the new group without requiring logout
+sg incus-admin -c '
+  # Fix lxcfs for WSL2 (recommended for proper resource reporting)
+  sudo apt install -y lxcfs
+  sudo mkdir -p /etc/systemd/system/lxcfs.service.d
+  echo "[Unit]
+ConditionVirtualization=" | sudo tee /etc/systemd/system/lxcfs.service.d/override.conf > /dev/null
+  sudo systemctl daemon-reload
+  sudo systemctl start lxcfs
 
-sudo tee /etc/systemd/system/lxcfs.service.d/override.conf > /dev/null << 'EOF'
-[Unit]
-ConditionVirtualization=
-EOF
-
-sudo systemctl daemon-reload
-sudo systemctl start lxcfs
-
-# lxcfs won't start on WSL2 without the override because systemd detects
-# WSL2 as a container environment and skips it.
-
-# 3. Build the container
-# This takes 15-20 minutes (Erlang compiles from source)
-git clone https://github.com/phiat/cobalt-crucible.git
-cd cobalt-crucible
-bash setup.sh my-dev ./provision.sh
+  # Clone and build container (takes 15-20 minutes - Erlang compiles from source)
+  git clone https://github.com/phiat/cobalt-crucible.git
+  cd cobalt-crucible
+  bash setup.sh my-dev ./provision.sh
+'
 ```
 
 Then shell in:
