@@ -16,9 +16,11 @@ sudo apt install -y incus
 sudo incus admin init --auto
 sudo usermod -aG incus-admin $USER
 
-# 2. Clone repo (if you haven't already)
-git clone https://github.com/phiat/cobalt-crucible.git
-cd cobalt-crucible
+# 2. Clone repo if not already in it
+if [ ! -f setup.sh ]; then
+  git clone https://github.com/phiat/cobalt-crucible.git
+  cd cobalt-crucible
+fi
 
 # 3. Run remaining setup with incus-admin group active (using sg)
 # This uses 'sg' to run commands with the new group without requiring logout
@@ -33,6 +35,9 @@ sg incus-admin -c '
   # Build container
   bash setup.sh my-dev ./provision.sh
 '
+
+# 4. Activate the incus-admin group in your current shell (or logout/login)
+newgrp incus-admin
 ```
 
 Then shell in:
