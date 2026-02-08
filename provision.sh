@@ -83,7 +83,7 @@ source /usr/share/doc/fzf/examples/key-bindings.zsh
 source /usr/share/doc/fzf/examples/completion.zsh
 EOF
 
-chsh -s $(which zsh) > /dev/null 2>&1
+chsh -s "$(which zsh)" > /dev/null 2>&1
 
 # tmux config
 cat > /root/.tmux.conf << 'EOF'

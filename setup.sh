@@ -25,6 +25,6 @@ incus config set "$CONTAINER_NAME" limits.memory 8GB
 incus config set "$CONTAINER_NAME" limits.cpu 8
 
 echo -e "\n🐎 Running setup script...\n"
-cat "$SCRIPT_PATH" | incus exec "$CONTAINER_NAME" -- bash
+incus exec "$CONTAINER_NAME" -- bash < "$SCRIPT_PATH"
 
 echo -e "\n✅ Setup complete! Access with: incus shell $CONTAINER_NAME"
