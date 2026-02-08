@@ -34,7 +34,7 @@ sudo systemctl start lxcfs
 # This takes 15-20 minutes (Erlang compiles from source)
 git clone https://github.com/phiat/cobalt-crucible.git
 cd cobalt-crucible
-bash create-dev-container.sh my-dev ./dev-setup.sh
+bash setup.sh my-dev ./provision.sh
 ```
 
 Then shell in:
@@ -51,15 +51,15 @@ incus rename my-dev new-name
 
 ## What Gets Installed
 
-`dev-setup.sh` provisions the container with:
+`provision.sh` provisions the container with:
 
-- **System**: build-essential, curl, wget, git, htop, tmux, net-tools, etc.
+- **System**: build-essential, curl, wget, git, htop, tmux, tree, net-tools, etc.
 - **Shell**: zsh + Oh My Zsh (agnoster theme), tmux (maroon/cyan theme, mouse on, status top)
 - **Languages** (via mise): Node.js, Go, Rust, Erlang, Elixir, Python, Java, Clojure, Zig, Bun
-- **CLI tools** (via mise): jq, bat, typst, lazydocker
+- **CLI tools** (via mise): jq, bat, typst, lazydocker, yarn, ripgrep, fd
 - **Containers**: Podman
 - **Networking**: Tailscale
-- **Dev tools**: Claude Code, OpenCode, fzf
+- **Dev tools**: Claude Code, OpenCode, GitHub CLI (gh), fzf
 
 ## Snapshots
 
@@ -88,7 +88,7 @@ incus start <name>
 
 ## Resource Limits
 
-Defaults are set in `create-dev-container.sh` (8GB memory, 8 CPUs). Adjust per container:
+Defaults are set in `setup.sh` (8GB memory, 8 CPUs). Adjust per container:
 
 ```bash
 incus config set <name> limits.memory 4GB

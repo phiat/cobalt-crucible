@@ -7,7 +7,7 @@ export APT_LISTCHANGES_FRONTEND=none
 export SYSTEMD_PAGER=
 
 # Progress tracking
-TOTAL_STEPS=12
+TOTAL_STEPS=13
 CURRENT_STEP=0
 
 progress() {
@@ -32,8 +32,16 @@ complete
 progress "⏳ Installing base packages"
 apt-get install -y -qq curl wget git vim nano htop build-essential \
   net-tools iputils-ping dnsutils tmux zsh ca-certificates \
-  gnupg lsb-release software-properties-common fzf \
+  gnupg lsb-release software-properties-common fzf tree \
   libssl-dev pkg-config libncurses5-dev > /dev/null 2>&1 || error "Failed to install base packages"
+complete
+
+progress "⏳ Installing GitHub CLI"
+curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg 2>/dev/null | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg > /dev/null 2>&1
+chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" > /etc/apt/sources.list.d/github-cli.list
+apt-get update -qq > /dev/null 2>&1
+apt-get install -y -qq gh > /dev/null 2>&1 || error "Failed to install GitHub CLI"
 complete
 
 progress "⏳ Installing Podman"
@@ -117,6 +125,7 @@ $MISE_PATH use -g --jobs 4 \
   node@lts go@latest rust@latest zig@latest \
   bun@latest jq@latest bat@latest typst@latest \
   lazydocker@latest java@openjdk clojure@latest \
+  yarn@latest ripgrep@latest fd@latest \
   > /dev/null 2>&1 || error "Failed to install binary tools"
 complete
 
@@ -157,6 +166,11 @@ echo "  • jq: $(jq --version 2>/dev/null || echo 'NOT FOUND')"
 echo "  • bat: $(bat --version 2>/dev/null | awk '{print $2}' || echo 'NOT FOUND')"
 echo "  • typst: $(typst --version 2>/dev/null | awk '{print $2}' || echo 'NOT FOUND')"
 echo "  • lazydocker: $(lazydocker --version 2>/dev/null | awk '{print $4}' || echo 'NOT FOUND')"
+echo "  • yarn: $(yarn --version 2>/dev/null || echo 'NOT FOUND')"
+echo "  • ripgrep: $(rg --version 2>/dev/null | head -n1 | awk '{print $2}' || echo 'NOT FOUND')"
+echo "  • fd: $(fd --version 2>/dev/null | awk '{print $2}' || echo 'NOT FOUND')"
+echo "  • gh: $(gh --version 2>/dev/null | head -n1 | awk '{print $3}' || echo 'NOT FOUND')"
+echo "  • tree: $(tree --version 2>/dev/null | awk '{print $2}' || echo 'NOT FOUND')"
 echo "  • mise: $($MISE_PATH --version 2>/dev/null || echo 'NOT FOUND')"
 complete
 
