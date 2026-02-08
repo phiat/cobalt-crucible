@@ -1,4 +1,4 @@
-# inco-fi
+# cobalt-crucible
 
 Incus dev container setup for WSL2.
 

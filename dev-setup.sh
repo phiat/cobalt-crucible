@@ -7,7 +7,7 @@ export APT_LISTCHANGES_FRONTEND=none
 export SYSTEMD_PAGER=
 
 # Progress tracking
-TOTAL_STEPS=11
+TOTAL_STEPS=12
 CURRENT_STEP=0
 
 progress() {
@@ -78,33 +78,27 @@ EOF
 chsh -s $(which zsh) > /dev/null 2>&1
 complete
 
-progress "⏳ Installing languages via mise (this may take 5-10 minutes)"
+progress "⏳ Installing tools via mise (binary downloads, parallel)"
 export PATH="$HOME/.local/bin:$PATH"
 export MISE_PATH="$HOME/.local/bin/mise"
 
-echo "  → Installing Node.js (lts)..."
-$MISE_PATH use -g node@lts > /dev/null 2>&1 || error "Failed to install Node.js"
+echo "  → Batch installing binary tools..."
+$MISE_PATH use -g --jobs 4 \
+  node@lts go@latest rust@latest zig@latest \
+  bun@latest jq@latest bat@latest typst@latest \
+  lazydocker@latest java@openjdk clojure@latest \
+  > /dev/null 2>&1 || error "Failed to install binary tools"
+complete
 
-echo "  → Installing Go (latest)..."
-$MISE_PATH use -g go@latest > /dev/null 2>&1 || error "Failed to install Go"
-
-echo "  → Installing Rust (latest)..."
-$MISE_PATH use -g rust@latest > /dev/null 2>&1 || error "Failed to install Rust"
-
-echo "  → Installing Erlang (latest, this takes ~5-10 min)..."
+progress "⏳ Installing source-compiled tools via mise (slower)"
+echo "  → Installing Erlang (compiles from source, ~5-10 min)..."
 $MISE_PATH use -g erlang@latest 2>&1 | grep -v "^mise" || true
 
 echo "  → Installing Elixir (latest)..."
 $MISE_PATH use -g elixir@latest > /dev/null 2>&1 || error "Failed to install Elixir"
 
-echo "  → Installing Java (openjdk, latest)..."
-$MISE_PATH use -g java@openjdk > /dev/null 2>&1 || error "Failed to install Java"
-
-echo "  → Installing Clojure (latest)..."
-$MISE_PATH use -g clojure@latest > /dev/null 2>&1 || error "Failed to install Clojure"
-
-echo "  → Installing Zig (latest)..."
-$MISE_PATH use -g zig@latest > /dev/null 2>&1 || error "Failed to install Zig"
+echo "  → Installing Python (latest)..."
+$MISE_PATH use -g python@latest > /dev/null 2>&1 || error "Failed to install Python"
 
 complete
 
@@ -127,6 +121,12 @@ echo "  • Elixir: $(elixir --version 2>/dev/null | grep Elixir | awk '{print $
 echo "  • Java: $(java --version 2>/dev/null | head -n1 || echo 'NOT FOUND')"
 echo "  • Clojure: $(clojure --version 2>/dev/null || echo 'NOT FOUND')"
 echo "  • Zig: $(zig version 2>/dev/null || echo 'NOT FOUND')"
+echo "  • Python: $(python --version 2>/dev/null | awk '{print $2}' || echo 'NOT FOUND')"
+echo "  • Bun: $(bun --version 2>/dev/null || echo 'NOT FOUND')"
+echo "  • jq: $(jq --version 2>/dev/null || echo 'NOT FOUND')"
+echo "  • bat: $(bat --version 2>/dev/null | awk '{print $2}' || echo 'NOT FOUND')"
+echo "  • typst: $(typst --version 2>/dev/null | awk '{print $2}' || echo 'NOT FOUND')"
+echo "  • lazydocker: $(lazydocker --version 2>/dev/null | awk '{print $4}' || echo 'NOT FOUND')"
 echo "  • mise: $($MISE_PATH --version 2>/dev/null || echo 'NOT FOUND')"
 complete
 

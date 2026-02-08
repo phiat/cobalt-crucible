@@ -21,8 +21,8 @@ echo "⏳ Waiting for container to be ready..."
 sleep 3
 
 echo "🔒 Applying resource limits..."
-incus config set "$CONTAINER_NAME" limits.memory 4GB
-incus config set "$CONTAINER_NAME" limits.cpu 2
+incus config set "$CONTAINER_NAME" limits.memory 8GB
+incus config set "$CONTAINER_NAME" limits.cpu 8
 
 echo -e "\n🐎 Running setup script...\n"
 cat "$SCRIPT_PATH" | incus exec "$CONTAINER_NAME" -- bash
