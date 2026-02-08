@@ -43,6 +43,12 @@ Then shell in:
 incus shell my-dev
 ```
 
+## Renaming a Container
+
+```bash
+incus rename my-dev new-name
+```
+
 ## What Gets Installed
 
 `dev-setup.sh` provisions the container with:
@@ -100,6 +106,7 @@ incus shell <name>          # shell into container
 incus list                  # list containers
 incus info <name>           # resource usage
 incus config show <name>    # full config
+incus rename <old> <new>    # rename container
 incus restart <name>        # restart
 incus stop <name>           # stop
 incus delete <name> --force # delete
