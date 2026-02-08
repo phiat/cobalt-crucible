@@ -2,11 +2,24 @@
 
 Incus dev container setup for WSL2.
 
+## Prerequisites
+
+Install Incus and initialize it:
+
+```bash
+sudo apt install incus
+sudo incus admin init --auto
+```
+
+For proper memory reporting with resource limits, also set up [lxcfs](#lxcfs-on-wsl2).
+
 ## Quick Start
 
 **New machine:**
 
 ```bash
+sudo apt install incus
+sudo incus admin init --auto
 git clone https://github.com/phiat/cobalt-crucible.git
 cd cobalt-crucible
 bash create-dev-container.sh my-dev ./dev-setup.sh
