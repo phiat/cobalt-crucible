@@ -33,7 +33,11 @@ progress "⏳ Installing base packages"
 apt-get install -y -qq curl wget git vim nano htop build-essential \
   net-tools iputils-ping dnsutils tmux zsh ca-certificates \
   gnupg lsb-release software-properties-common fzf tree \
-  libssl-dev pkg-config libncurses5-dev > /dev/null 2>&1 || error "Failed to install base packages"
+  libssl-dev pkg-config libncurses5-dev openssh-server > /dev/null 2>&1 || error "Failed to install base packages"
+
+# Enable and start SSH
+systemctl enable ssh > /dev/null 2>&1
+systemctl start ssh > /dev/null 2>&1
 complete
 
 progress "⏳ Installing GitHub CLI"
