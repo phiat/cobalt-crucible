@@ -60,7 +60,7 @@ progress "⏳ Configuring zsh"
 cat > /root/.zshrc << 'EOF'
 # Path to oh-my-zsh installation
 export ZSH="$HOME/.oh-my-zsh"
-ZSH_THEME="robbyrussell"
+ZSH_THEME="agnoster"
 plugins=(git)
 source $ZSH/oh-my-zsh.sh
 
@@ -76,6 +76,36 @@ source /usr/share/doc/fzf/examples/completion.zsh
 EOF
 
 chsh -s $(which zsh) > /dev/null 2>&1
+
+# tmux config
+cat > /root/.tmux.conf << 'EOF'
+set-option -sg escape-time 10
+set-option -g default-terminal "screen-256color"
+
+bind r source-file ~/.tmux.conf
+
+set -g visual-activity off
+set -g visual-bell off
+set -g visual-silence off
+setw -g monitor-activity off
+set -g bell-action none
+
+set -g pane-border-style 'fg=maroon'
+set -g pane-active-border-style 'fg=cyan'
+
+set -g status-position top
+set -g status-justify left
+set -g status-style 'fg=cyan'
+
+set -g status-left ''
+
+set -g mouse on
+EOF
+
+# Ensure UTF-8 locale for powerline glyphs
+locale-gen en_US.UTF-8 > /dev/null 2>&1
+update-locale LANG=en_US.UTF-8 > /dev/null 2>&1
+
 complete
 
 progress "⏳ Installing tools via mise (binary downloads, parallel)"

@@ -57,7 +57,7 @@ claude login
 `dev-setup.sh` provisions the container with:
 
 - **System**: build-essential, curl, wget, git, htop, tmux, net-tools, etc.
-- **Shell**: zsh + Oh My Zsh (robbyrussell theme)
+- **Shell**: zsh + Oh My Zsh (agnoster theme), tmux (maroon/cyan theme, mouse on, status top)
 - **Languages** (via mise): Node.js, Go, Rust, Erlang, Elixir, Python, Java, Clojure, Zig, Bun
 - **CLI tools** (via mise): jq, bat, typst, lazydocker
 - **Containers**: Podman
