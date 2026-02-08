@@ -8,18 +8,14 @@ This provisions isolated, resource-limited Ubuntu 24.04 containers from your Ubu
 
 ## Setup
 
-### 1. Install Incus
-
 ```bash
+# 1. Install Incus
 sudo apt install incus
 sudo incus admin init --auto
-```
 
-### 2. Fix lxcfs for WSL2 (recommended)
-
-This fixes resource reporting inside containers. Without it, tools like `htop` and `free` show host memory instead of container limits. Only needed once per WSL2 host.
-
-```bash
+# 2. Fix lxcfs for WSL2 (recommended)
+# This fixes resource reporting inside containers. Without it, tools like htop
+# and free show host memory instead of container limits. Only needed once per WSL2 host.
 sudo apt install lxcfs
 sudo mkdir -p /etc/systemd/system/lxcfs.service.d
 
@@ -30,21 +26,18 @@ EOF
 
 sudo systemctl daemon-reload
 sudo systemctl start lxcfs
-```
 
-lxcfs won't start on WSL2 without the override because systemd detects WSL2 as a container environment and skips it.
+# lxcfs won't start on WSL2 without the override because systemd detects
+# WSL2 as a container environment and skips it.
 
-### 3. Build the container
-
-```bash
+# 3. Build the container
+# This takes 15-20 minutes (Erlang compiles from source)
 git clone https://github.com/phiat/cobalt-crucible.git
 cd cobalt-crucible
 bash create-dev-container.sh my-dev ./dev-setup.sh
 ```
 
-This takes 15-20 minutes (Erlang compiles from source).
-
-### 4. Shell in
+Then shell in:
 
 ```bash
 incus shell my-dev
