@@ -22,8 +22,7 @@ sg incus-admin -c '
   # Fix lxcfs for WSL2 (recommended for proper resource reporting)
   sudo apt install -y lxcfs
   sudo mkdir -p /etc/systemd/system/lxcfs.service.d
-  echo "[Unit]
-ConditionVirtualization=" | sudo tee /etc/systemd/system/lxcfs.service.d/override.conf > /dev/null
+  printf "[Unit]\nConditionVirtualization=\n" | sudo tee /etc/systemd/system/lxcfs.service.d/override.conf > /dev/null
   sudo systemctl daemon-reload
   sudo systemctl start lxcfs
 
