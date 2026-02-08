@@ -130,7 +130,7 @@ $MISE_PATH use -g --jobs 4 \
 complete
 
 progress "⏳ Installing source-compiled tools via mise (slower)"
-echo "  → Installing Erlang (compiles from source, ~5-10 min)..."
+echo "  → Installing Erlang (compiles from source)..."
 $MISE_PATH use -g erlang@latest 2>&1 | grep -v "^mise" || true
 
 echo "  → Installing Elixir (latest)..."
