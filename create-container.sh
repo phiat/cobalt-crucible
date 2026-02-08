@@ -45,6 +45,11 @@ elif [ -f "$HOME/.ssh/id_ed25519.pub" ]; then
     incus exec "$CONTAINER_NAME" -- chmod 600 /root/.ssh/authorized_keys
 fi
 
+# Set root password
+echo ""
+echo "🔐 Set root password for SSH access:"
+incus exec "$CONTAINER_NAME" -- passwd
+
 # Setup Tailscale if auth key is available
 if [ -n "$TAILSCALE_AUTHKEY" ] || [ -f "$HOME/.tailscale-authkey" ]; then
     AUTHKEY="${TAILSCALE_AUTHKEY:-$(cat "$HOME/.tailscale-authkey" 2>/dev/null)}"
