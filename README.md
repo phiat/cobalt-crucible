@@ -10,13 +10,16 @@ This provisions isolated, resource-limited Ubuntu 24.04 containers from your Ubu
 
 ```bash
 # 1. Install Incus
-sudo apt install incus
+# Ensure universe repository is enabled and package cache is updated
+sudo add-apt-repository -y universe
+sudo apt update
+sudo apt install -y incus
 sudo incus admin init --auto
 
 # 2. Fix lxcfs for WSL2 (recommended)
 # This fixes resource reporting inside containers. Without it, tools like htop
 # and free show host memory instead of container limits. Only needed once per WSL2 host.
-sudo apt install lxcfs
+sudo apt install -y lxcfs
 sudo mkdir -p /etc/systemd/system/lxcfs.service.d
 
 sudo tee /etc/systemd/system/lxcfs.service.d/override.conf > /dev/null << 'EOF'
