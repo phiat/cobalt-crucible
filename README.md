@@ -27,7 +27,7 @@ ConditionVirtualization=" | sudo tee /etc/systemd/system/lxcfs.service.d/overrid
   sudo systemctl daemon-reload
   sudo systemctl start lxcfs
 
-  # Clone and build container (Erlang compiles from source)
+  # Clone and build container
   git clone https://github.com/phiat/cobalt-crucible.git
   cd cobalt-crucible
   bash setup.sh my-dev ./provision.sh
