@@ -43,7 +43,7 @@ Then shell in:
 incus shell my-dev
 ```
 
-## Renaming a Container
+Rename the container (optional):
 
 ```bash
 incus rename my-dev new-name
