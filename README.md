@@ -16,7 +16,11 @@ sudo apt install -y incus
 sudo incus admin init --auto
 sudo usermod -aG incus-admin $USER
 
-# 2. Run remaining setup with incus-admin group active (using sg)
+# 2. Clone repo (if you haven't already)
+git clone https://github.com/phiat/cobalt-crucible.git
+cd cobalt-crucible
+
+# 3. Run remaining setup with incus-admin group active (using sg)
 # This uses 'sg' to run commands with the new group without requiring logout
 sg incus-admin -c '
   # Fix lxcfs for WSL2 (recommended for proper resource reporting)
@@ -26,9 +30,7 @@ sg incus-admin -c '
   sudo systemctl daemon-reload
   sudo systemctl start lxcfs
 
-  # Clone and build container
-  git clone https://github.com/phiat/cobalt-crucible.git
-  cd cobalt-crucible
+  # Build container
   bash setup.sh my-dev ./provision.sh
 '
 ```
