@@ -74,7 +74,29 @@ incus publish my-dev --alias cobalt-crucible-base
 incus start my-dev
 ```
 
-Launch from snapshot:
+## Launching Containers
+
+**With Tailscale (recommended):**
+
+First, store your Tailscale auth key (generate at https://login.tailscale.com/admin/settings/keys):
+
+```bash
+# Store auth key (choose one method)
+export TAILSCALE_AUTHKEY="tskey-auth-xxxxx"
+# OR
+echo "tskey-auth-xxxxx" > ~/.tailscale-authkey
+chmod 600 ~/.tailscale-authkey
+```
+
+Then launch with automatic Tailscale connection:
+
+```bash
+bash launch-container.sh my-container-name
+```
+
+This launches the container, connects to Tailscale, and shows the IP for SSH access.
+
+**Without Tailscale:**
 
 ```bash
 incus launch cobalt-crucible-base <name>
