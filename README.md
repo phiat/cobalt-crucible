@@ -1,6 +1,10 @@
 # cobalt-crucible
 
-Incus dev container setup for WSL2.
+Automated setup for Ubuntu 24.04 development containers using Incus on Ubuntu 24.04 running in WSL2.
+
+This provisions isolated, resource-limited Ubuntu 24.04 containers from your Ubuntu 24.04 WSL2 host. Each container includes a full polyglot dev environment (Node, Go, Rust, Erlang, Elixir, Python, Java, Clojure, Zig, Bun) managed by mise, plus Podman, Tailscale, Claude Code, OpenCode, and a configured zsh/tmux setup.
+
+**Use case**: Spin up clean, reproducible dev environments in seconds (after first build), snapshot them for reuse, and enforce resource limits (memory/CPU) per container.
 
 ## Setup
 
@@ -11,9 +15,9 @@ sudo apt install incus
 sudo incus admin init --auto
 ```
 
-### 2. Fix lxcfs for WSL2 (optional but recommended)
+### 2. Fix lxcfs for WSL2 (recommended)
 
-Without this, tools like `htop` and `free` inside containers report host memory instead of the container's limit. Only needed once per host.
+This fixes resource reporting inside containers. Without it, tools like `htop` and `free` show host memory instead of container limits. Only needed once per WSL2 host.
 
 ```bash
 sudo apt install lxcfs
@@ -44,12 +48,6 @@ This takes 15-20 minutes (Erlang compiles from source).
 
 ```bash
 incus shell my-dev
-```
-
-Claude Code and OpenCode require login after first launch:
-
-```bash
-claude login
 ```
 
 ## What Gets Installed
