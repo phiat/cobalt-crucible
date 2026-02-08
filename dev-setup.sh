@@ -1,0 +1,138 @@
+#!/bin/bash
+set -e
+
+# Suppress apt warnings and interactive prompts
+export DEBIAN_FRONTEND=noninteractive
+export APT_LISTCHANGES_FRONTEND=none
+export SYSTEMD_PAGER=
+
+# Progress tracking
+TOTAL_STEPS=11
+CURRENT_STEP=0
+
+progress() {
+    CURRENT_STEP=$((CURRENT_STEP + 1))
+    echo -e "\n[$CURRENT_STEP/$TOTAL_STEPS] $1"
+}
+
+complete() {
+    echo "✓ Done"
+}
+
+error() {
+    echo "❌ Error: $1"
+    exit 1
+}
+
+progress "⏳ Updating system"
+apt-get update -qq > /dev/null 2>&1 || error "Failed to update system"
+apt-get upgrade -y -qq > /dev/null 2>&1 || error "Failed to upgrade system"
+complete
+
+progress "⏳ Installing base packages"
+apt-get install -y -qq curl wget git vim nano htop build-essential \
+  net-tools iputils-ping dnsutils tmux zsh ca-certificates \
+  gnupg lsb-release software-properties-common fzf \
+  libssl-dev pkg-config libncurses5-dev > /dev/null 2>&1 || error "Failed to install base packages"
+complete
+
+progress "⏳ Installing Podman"
+apt-get install -y -qq podman > /dev/null 2>&1 || error "Failed to install Podman"
+complete
+
+progress "⏳ Installing Tailscale"
+curl -fsSL https://tailscale.com/install.sh 2>/dev/null | sh > /dev/null 2>&1 || error "Failed to install Tailscale"
+complete
+
+progress "⏳ Installing mise"
+curl -sSf https://mise.run 2>/dev/null | sh > /dev/null 2>&1 || error "Failed to install mise"
+complete
+
+progress "⏳ Installing Oh My Zsh"
+RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh 2>/dev/null)" > /dev/null 2>&1
+# Verify it installed
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+    error "Oh My Zsh installation failed"
+fi
+complete
+
+progress "⏳ Configuring zsh"
+cat > /root/.zshrc << 'EOF'
+# Path to oh-my-zsh installation
+export ZSH="$HOME/.oh-my-zsh"
+ZSH_THEME="robbyrussell"
+plugins=(git)
+source $ZSH/oh-my-zsh.sh
+
+# mise
+eval "$(~/.local/bin/mise activate zsh)"
+
+# Erlang shell history
+export ERL_AFLAGS="-kernel shell_history enabled"
+
+# fzf key bindings
+source /usr/share/doc/fzf/examples/key-bindings.zsh
+source /usr/share/doc/fzf/examples/completion.zsh
+EOF
+
+chsh -s $(which zsh) > /dev/null 2>&1
+complete
+
+progress "⏳ Installing languages via mise (this may take 5-10 minutes)"
+export PATH="$HOME/.local/bin:$PATH"
+export MISE_PATH="$HOME/.local/bin/mise"
+
+echo "  → Installing Node.js (lts)..."
+$MISE_PATH use -g node@lts > /dev/null 2>&1 || error "Failed to install Node.js"
+
+echo "  → Installing Go (latest)..."
+$MISE_PATH use -g go@latest > /dev/null 2>&1 || error "Failed to install Go"
+
+echo "  → Installing Rust (latest)..."
+$MISE_PATH use -g rust@latest > /dev/null 2>&1 || error "Failed to install Rust"
+
+echo "  → Installing Erlang (latest, this takes ~5-10 min)..."
+$MISE_PATH use -g erlang@latest 2>&1 | grep -v "^mise" || true
+
+echo "  → Installing Elixir (latest)..."
+$MISE_PATH use -g elixir@latest > /dev/null 2>&1 || error "Failed to install Elixir"
+
+echo "  → Installing Java (openjdk, latest)..."
+$MISE_PATH use -g java@openjdk > /dev/null 2>&1 || error "Failed to install Java"
+
+echo "  → Installing Clojure (latest)..."
+$MISE_PATH use -g clojure@latest > /dev/null 2>&1 || error "Failed to install Clojure"
+
+echo "  → Installing Zig (latest)..."
+$MISE_PATH use -g zig@latest > /dev/null 2>&1 || error "Failed to install Zig"
+
+complete
+
+progress "⏳ Installing Claude Code"
+eval "$($MISE_PATH activate bash)"
+npm install -g @anthropic-ai/claude-code > /dev/null 2>&1 || error "Failed to install Claude Code"
+complete
+
+progress "⏳ Installing OpenCode"
+curl -fsSL https://opencode.ai/install 2>/dev/null | bash > /dev/null 2>&1 || error "Failed to install OpenCode"
+complete
+
+progress "⏳ Verifying installations"
+eval "$($MISE_PATH activate bash)"
+echo "  • Node: $(node --version 2>/dev/null || echo 'NOT FOUND')"
+echo "  • Go: $(go version 2>/dev/null | awk '{print $3}' || echo 'NOT FOUND')"
+echo "  • Rust: $(rustc --version 2>/dev/null | awk '{print $2}' || echo 'NOT FOUND')"
+echo "  • Erlang: $(erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().' -noshell 2>/dev/null || echo 'NOT FOUND')"
+echo "  • Elixir: $(elixir --version 2>/dev/null | grep Elixir | awk '{print $2}' || echo 'NOT FOUND')"
+echo "  • Java: $(java --version 2>/dev/null | head -n1 || echo 'NOT FOUND')"
+echo "  • Clojure: $(clojure --version 2>/dev/null || echo 'NOT FOUND')"
+echo "  • Zig: $(zig version 2>/dev/null || echo 'NOT FOUND')"
+echo "  • mise: $($MISE_PATH --version 2>/dev/null || echo 'NOT FOUND')"
+complete
+
+echo -e "\n🎉 Installation complete!"
+echo "Exit and re-enter to use zsh with all tools configured"
+echo ""
+echo "Installed tools managed by mise:"
+echo "  • Run 'mise ls' to see installed versions"
+echo "  • Run 'mise use <tool>@<version>' to install other versions"
