@@ -4,21 +4,19 @@ Incus dev container setup for WSL2.
 
 ## Quick Start
 
-**From snapshot (fast — seconds):**
+**New machine:**
+
+```bash
+git clone https://github.com/phiat/cobalt-crucible.git
+cd cobalt-crucible
+bash create-dev-container.sh my-dev ./dev-setup.sh
+incus shell my-dev
+```
+
+**From snapshot (fast — seconds, local only):**
 
 ```bash
 incus launch cobalt-crucible-base <name>
-```
-
-**From scratch (full build — 15-20 min):**
-
-```bash
-./create-dev-container.sh <name> ./dev-setup.sh
-```
-
-Then shell in:
-
-```bash
 incus shell <name>
 ```
 
